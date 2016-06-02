@@ -1,7 +1,7 @@
 # Jelastic Liferay Add-on
 
 This repository provides [Liferay](http://www.liferay.com/) add-on for Jelastic Platform.
-[![GET IT HOSTED](https://raw.githubusercontent.com/JelasticJPS/Liferay/master/images/getithosted.png)](http://go.jelastic.com/test?hoster-select=1&theme=modern&app=https://raw.githubusercontent.com/JelasticJPS/Liferay/master/Liferay-6.2.json)
+
 
 **Liferay Portal** is an enterprise web platform for building business solutions that deliver immediate results and long-term value.
 
