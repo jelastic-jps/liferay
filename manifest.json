@@ -5,7 +5,7 @@
 		"id": "liferay",
 		"name": "Liferay",
 		"version": "6.2",
-		"logo": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/images/liferay.png",
+		"logo": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/images/liferay.png",
 		"type": "java",
 		"homepage": "http://www.liferay.com/",
 		"categories": [
@@ -34,64 +34,64 @@
 			},
 			"upload": [{
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/mysql-connector-java-5.1.23-bin.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/mysql-connector-java-5.1.23-bin.jar",
 					"destPath": "${SERVER_WEBROOT}/ROOT/WEB-INF/lib/mysql-connector-java-5.1.23.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/portal-service.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/portal-service.jar",
 					"destPath": "${SERVER_LIBS}/portal-service.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/hsql.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/hsql.jar",
 					"destPath": "${SERVER_LIBS}/hsql.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/portlet.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/portlet.jar",
 					"destPath": "${SERVER_LIBS}/portlet.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/activation.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/activation.jar",
 					"destPath": "${SERVER_LIBS}/activation.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/ccpp.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/ccpp.jar",
 					"destPath": "${SERVER_LIBS}/ccpp.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/jms.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/jms.jar",
 					"destPath": "${SERVER_LIBS}/jms.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/jta.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/jta.jar",
 					"destPath": "${SERVER_LIBS}/jta.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/jtds.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/jtds.jar",
 					"destPath": "${SERVER_LIBS}/jtds.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/jutf7.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/jutf7.jar",
 					"destPath": "${SERVER_LIBS}/jutf7.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/mail.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/mail.jar",
 					"destPath": "${SERVER_LIBS}/mail.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/persistence.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/persistence.jar",
 					"destPath": "${SERVER_LIBS}/persistence.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/junit-4.10.jar",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/junit-4.10.jar",
 					"destPath": "${SERVER_LIBS}/junit-4.10.jar"
 				}, {
 					"nodeType": "tomcat7",
-					"sourcePath": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/libs/portal-ext.properties.txt",
+					"sourcePath": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/libs/portal-ext.properties.txt",
 					"destPath": "${HOME}/portal-ext.properties"
 				}
 			],
 			"deployments": [{
-					"archive": "https://media.githubusercontent.com/media/JelasticJPS/Liferay/master/dumps/liferay-portal-6.2-ce-ga4-20150416163831865.war",
+					"archive": "https://media.githubusercontent.com/media/jelastic-jps/Liferay/master/dumps/liferay-portal-6.2-ce-ga4-20150416163831865.war",
 					"name": "liferay-portal-6.2-ce-ga4-20150416163831865.war",
 					"context": "ROOT"
 				}
@@ -101,7 +101,7 @@
 					"database": {
 						"name": "lportal",
 						"user": "liferay",
-						"dump": "https://raw.githubusercontent.com/JelasticJPS/Liferay/master/dumps/lportal.sql"
+						"dump": "https://raw.githubusercontent.com/jelastic-jps/Liferay/master/dumps/lportal.sql"
 					}
 				}, {
 					"nodeType": "tomcat7",
