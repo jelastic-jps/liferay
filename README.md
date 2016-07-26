@@ -23,7 +23,7 @@ DB                   |    MySQL      |       1                        |         
 * DB - Database 
 * CT - Container
 
-**Liferay Version**: 6.2<br/>
+**Liferay Version**: Community Edition 6.2 CE GA4<br/>
 **Tomcat Version**: 7.0.67<br/>
 **Java Engine**: Java 7<br/>
 **MySQL Database**: 5.7.12
