@@ -17,7 +17,7 @@ Liferay has built its business becoming the best partner for providing enterpris
 Layer                |     Server    | Number of CTs <br/> by default | Cloudlets per CT <br/> (reserved/dynamic) | Options
 -------------------- | --------------| :----------------------------: | :---------------------------------------: | :-----:
 AS                   | Tomcat Java |       1                        |           1 / 16                          | -
-DB                   |    MySQL      |       1                        |           1 / 16                           | -
+DB                   |    MySQL      |       1                        |           1 / 8                           | -
 
 * AS - Application server 
 * DB - Database 
