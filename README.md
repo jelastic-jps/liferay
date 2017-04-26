@@ -10,7 +10,7 @@ Liferay has built its business becoming the best partner for providing enterpris
 
 ### Environment Topology
 
-![Liferay Topology](https://docs.google.com/drawings/d/1MvtJKk03IznrXtl4m2oGkSg5ZeLIwczFdwylbPRs7E8/pub?w=505&h=216)
+![liferay-environment-topology](images/liferay-environment-topology.png)
 
 ### Specifics
 
