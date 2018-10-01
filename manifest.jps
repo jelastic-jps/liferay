@@ -27,7 +27,7 @@
     }
   ],
   {
-  "ha": "true";
+  "ha": "true"
   },
   "onInstall": [
     "deployArchve",
