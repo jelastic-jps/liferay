@@ -24,11 +24,12 @@
       "cloudlets": 8,
       "count": 2,
       "nodeType": "mysql5"
-    }
-  ],
+    },
   {
   "ha": "true"
-  },
+  }
+  
+  ],
   "onInstall": [
     "deployArchve",
     "deployHomeDir",
