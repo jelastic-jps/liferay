@@ -28,7 +28,7 @@
   ],
   {
   "ha": "true";
-  }
+  },
   "onInstall": [
     "deployArchve",
     "deployHomeDir",
