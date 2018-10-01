@@ -1,6 +1,6 @@
 [![Liferay](images/Liferay-Logo.png)](../../../liferay)
 
-## Liferay
+## Liferay Cluster
 
 The JPS package deploys [Liferay](http://www.liferay.com/) that initially contains 1 application server and 1 database container. 
 
