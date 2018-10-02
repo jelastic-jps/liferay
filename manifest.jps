@@ -17,7 +17,7 @@
   "nodes": [
     {
       "cloudlets": 8,
-      "count": 2,
+      "count": 1,
       "nodeType": "mysql5"
     },
     {
