@@ -16,16 +16,15 @@
   "ha":"true",
   "nodes": [
     {
-      "cloudlets": 16,
-      "count": 2,
-      "nodeType": "tomcat",
-      "tag": "8.5.29-openjdk-1.8.0_161",
-      "ha":"true"
-    },
-    {
       "cloudlets": 8,
       "count": 2,
       "nodeType": "mysql5"
+    },
+    {
+      "cloudlets": 16,
+      "count": 2,
+      "nodeType": "tomcat",
+      "tag": "8.5.29-openjdk-1.8.0_161"
     },
     {
     "nodeType": "nginx",
@@ -34,8 +33,7 @@
     "nodeGroup": "bl",
     "displayName": "Load balancer"
     }
-
-  
+ 
   ],
   "onInstall": [
     "deployArchve",
