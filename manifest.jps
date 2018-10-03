@@ -113,10 +113,14 @@
       }
     ],
     "createDb": [
+     {
+           cmd[proxy]: |-
+            mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "use main; insert into mysql_users(username,password,active,use_ssl,default_hostgroup,default_schema,schema_locked,transaction_persistent,fast_forward,backend,frontend) values('liferay','${globals.DB_PASSWORD}','1','0','10','NULL','0','1','0','1','1' );"
+      },
       {
         "prepareSqlDatabase": [
           {
-            "nodeId": "${nodes.sqldb.first.id}",
+            "nodeId": "${nodes.proxy.master.id}",
             "loginCredentials": {
               "user": "root",
               "password": "${nodes.mysql5.password}"
