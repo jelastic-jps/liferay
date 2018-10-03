@@ -38,6 +38,7 @@
   "onInstall": [
     "deployArchve",
     "deployHomeDir",
+    "createProxyUser",
     "createDb"
   ],
   "success": "Please enter your new admin email, name and password</br></br>To add custom domain name for your Liferay installation follow the steps described in our <a href='http://docs.jelastic.com/custom-domains' target='_blank'>documentation</a>",
@@ -112,6 +113,13 @@
         ]
       }
     ],
+    "createProxyUser": [{
+        "cmd[proxy]": [
+                  "mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e \"use main; insert into mysql_users(username,password,active,use_ssl,default_hostgroup,default_schema,schema_locked,transaction_persistent,fast_forward,backend,frontend) values('liferay','${globals.DB_PASSWORD}','1','0','10','NULL','0','1','0','1','1' );\""
+                                                ]
+    }
+  ],
+    
     "createDb": [
      {
            cmd[proxy]: |-
