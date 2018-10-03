@@ -17,7 +17,7 @@
   "nodes": [
     {
       "cloudlets": 8,
-      "count": 1,
+      "count": 2,
       "nodeType": "mysql5"
     },
     {
@@ -53,7 +53,7 @@
       {
         "cmd": [
           "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download\" -o /opt/tomcat/temp/portal-ext.properties",
-          "sed -i \"s|jdbc.default.url\\s*=\\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.first.id}-${env.domain}/lportal|g\" /opt/tomcat/temp/portal-ext.properties",
+          "sed -i \"s|jdbc.default.url\\s*=\\s*.*|jdbc.default.url=jdbc:mysql://docker${nodes.proxy.first.id}-${env.domain}/lportal|g\" /opt/tomcat/temp/portal-ext.properties",
           "sed -i \"s|jdbc.default.username\\s*=\\s*.*|jdbc.default.username=liferay|g\" /opt/tomcat/temp/portal-ext.properties",
           "mkdir -p /opt/tomcat/temp/liferay/osgi/",
           "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=8c0313f24cfd08609e19764e13ee0bfb&download\" -o /opt/tomcat/temp/liferay/osgi/osgi.zip",
@@ -120,10 +120,10 @@
       {
         "prepareSqlDatabase": [
           {
-            "nodeId": "${nodes.proxy.master.id}",
+            "nodeId": "${nodes.proxy.first.id}",
             "loginCredentials": {
-              "user": "root",
-              "password": "${nodes.mysql5.password}"
+              "user": "settings.db_user",
+              "password": "${settings.db_pass}"
             },
             "newDatabaseName": "lportal",
             "newDatabaseUser": {
