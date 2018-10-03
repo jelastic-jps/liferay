@@ -71,7 +71,7 @@
           {
             "replacements": [
               {
-                "replacement": "jdbc.default.password=${globals.DB_PASSWORD}\ninclude-and-override=${user.home}/liferay/portal-setup-wizard.properties",
+                "replacement": "jdbc.default.password=${globals.DB_PASSWORD}",
                 "pattern": "jdbc\\.default\\.password\\s*=\\s*.*"
               }
             ],
