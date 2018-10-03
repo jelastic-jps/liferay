@@ -15,30 +15,28 @@
   "engine": "java8",
   "ha":"true",
   "nodes": [
-    {
-      "cloudlets": 8,
-      "count": 2,
-      "nodeType": "mysql5"
-    },
-    {
+     {
       "cloudlets": 16,
       "count": 2,
       "nodeType": "tomcat",
       "tag": "8.5.29-openjdk-1.8.0_161"
     },
-    {
+      {
+      "cloudlets": 8,
+      "count": 2,
+      "nodeType": "mysql5"
+    },
+      {
     "nodeType": "nginx",
     "count": "1",
     "cloudlets": "8",
     "nodeGroup": "bl",
     "displayName": "Load balancer"
     }
- 
   ],
   "onInstall": [
     "deployArchve",
     "deployHomeDir",
-    "createProxyUser",
     "createDb"
   ],
   "success": "Please enter your new admin email, name and password</br></br>To add custom domain name for your Liferay installation follow the steps described in our <a href='http://docs.jelastic.com/custom-domains' target='_blank'>documentation</a>",
@@ -54,7 +52,7 @@
       {
         "cmd": [
           "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download\" -o /opt/tomcat/temp/portal-ext.properties",
-          "sed -i \"s|jdbc.default.url\\s*=\\s*.*|jdbc.default.url=jdbc:mysql://docker${nodes.proxy.first.id}-${env.domain}/lportal|g\" /opt/tomcat/temp/portal-ext.properties",
+          "sed -i \"s|jdbc.default.url\\s*=\\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.master.id}-${env.domain}/lportal|g\" /opt/tomcat/temp/portal-ext.properties",
           "sed -i \"s|jdbc.default.username\\s*=\\s*.*|jdbc.default.username=liferay|g\" /opt/tomcat/temp/portal-ext.properties",
           "mkdir -p /opt/tomcat/temp/liferay/osgi/",
           "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=8c0313f24cfd08609e19764e13ee0bfb&download\" -o /opt/tomcat/temp/liferay/osgi/osgi.zip",
@@ -113,21 +111,14 @@
         ]
       }
     ],
-    "createProxyUser": [{
-        "cmd[proxy]": [
-                  "mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e \"use main; insert into mysql_users(username,password,active,use_ssl,default_hostgroup,default_schema,schema_locked,transaction_persistent,fast_forward,backend,frontend) values('liferay','${globals.DB_PASSWORD}','1','0','10','NULL','0','1','0','1','1' );\""
-                                                ]
-    }
-  ],
-    
     "createDb": [
      {
         "prepareSqlDatabase": [
           {
-            "nodeId": "${nodes.proxy.first.id}",
+            "nodeId": "${nodes.sqldb.master.id}",
             "loginCredentials": {
-              "user": "settings.db_user",
-              "password": "${settings.db_pass}"
+              "user": "root",
+              "password": "${nodes.mysql5.password}"
             },
             "newDatabaseName": "lportal",
             "newDatabaseUser": {
@@ -136,6 +127,11 @@
             }
           }
         ]
+      },
+      {
+        "restartNodes": {
+          "nodeType": "cp"
+        }
       }
     ]
   }
