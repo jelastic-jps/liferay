@@ -52,8 +52,8 @@
     "getProxyUserPass": [
       {
         "cmd": [
-          "proxy_dbuser=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e "use main;select username from mysql_users;" 2>/dev/null | awk -F\  '{print $1}');",
-          "proxy_dbpass=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e "use main;select password from mysql_users;" 2>/dev/null | awk -F\  '{print $1}');"
+          "proxy_dbuser=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e \"use main;select username from mysql_users;\" 2>/dev/null | awk -F\  '{print $1}');",
+          "proxy_dbpass=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e \"use main;select password from mysql_users;\" 2>/dev/null | awk -F\  '{print $1}');"
                ],
          "nodeId": "nodes.proxy.master.id"
        },
