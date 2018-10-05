@@ -36,6 +36,7 @@
   ],
   "onInstall": [
     "deployArchve",
+    "getProxyUserPass",
     "deployHomeDir",
     "createDb"
   ],
