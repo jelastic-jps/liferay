@@ -48,12 +48,21 @@
         "archive": "https://download.jelastic.com/public.php?service=files&t=5104bf6454dec4e1a516d67773271a80&download"
       }
     },
+    "getProxyUserPass": [
+      {
+        "cmd": [
+          "proxy_dbuser=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e "use main;select username from mysql_users;" 2>/dev/null | awk -F\  '{print $1}');",
+          "proxy_dbpass=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e "use main;select password from mysql_users;" 2>/dev/null | awk -F\  '{print $1}');"
+               ],
+         "nodeId": "nodes.proxy.master.id"
+       },
+       ],
     "deployHomeDir": [
       {
         "cmd": [
           "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download\" -o /opt/tomcat/temp/portal-ext.properties",
-          "sed -i \"s|jdbc.default.url\\s*=\\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.master.id}-${env.domain}/lportal|g\" /opt/tomcat/temp/portal-ext.properties",
-          "sed -i \"s|jdbc.default.username\\s*=\\s*.*|jdbc.default.username=liferay|g\" /opt/tomcat/temp/portal-ext.properties",
+          "sed -i \"s|jdbc.default.url\\s*=\\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.proxy.master.id}-${env.domain}/lportal|g\" /opt/tomcat/temp/portal-ext.properties",
+          "sed -i \"s|jdbc.default.username\\s*=\\s*.*|jdbc.default.username=${proxy_dbuser}|g\" /opt/tomcat/temp/portal-ext.properties",
           "mkdir -p /opt/tomcat/temp/liferay/osgi/",
           "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=8c0313f24cfd08609e19764e13ee0bfb&download\" -o /opt/tomcat/temp/liferay/osgi/osgi.zip",
           "unzip -q /opt/tomcat/temp/liferay/osgi/osgi.zip -d /opt/tomcat/temp/liferay/osgi",
@@ -71,7 +80,7 @@
           {
             "replacements": [
               {
-                "replacement": "jdbc.default.password=${globals.DB_PASSWORD}",
+                "replacement": "jdbc.default.password=${proxy_dbpass}",
                 "pattern": "jdbc\\.default\\.password\\s*=\\s*.*"
               }
             ],
