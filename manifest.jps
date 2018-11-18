@@ -1,148 +1,94 @@
-{
-  "version": "0.3",
-  "type": "install",
-  "name": "Liferay",
-  "logo": "https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png",
-  "homepage": "http://www.liferay.com/",
-  "categories": [
-    "apps/cms",
-    "apps/content-management"
-  ],
-  "description": "<p>Liferay Portal is an enterprise web platform for building business solutions that deliver immediate results and long-term value.</p>",
-  "globals": {
-    "DB_PASSWORD": "${fn.password}"
-  },
-  "engine": "java8",
-  "ha":"true",
-  "nodes": [
-     {
-      "cloudlets": 16,
-      "count": 2,
-      "nodeType": "tomcat",
-      "tag": "8.5.29-openjdk-1.8.0_161"
-    },
-      {
-      "cloudlets": 8,
-      "count": 2,
-      "nodeType": "mysql5"
-    },
-      {
-    "nodeType": "nginx",
-    "count": "1",
-    "cloudlets": "8",
-    "nodeGroup": "bl",
-    "displayName": "Load balancer"
-    }
-  ],
-  "onInstall": [
-    "deployArchve",
-    "getProxyUserPass",
-    "deployHomeDir",
-    "createDb"
-  ],
-  "success": "Please enter your new admin email, name and password</br></br>To add custom domain name for your Liferay installation follow the steps described in our <a href='http://docs.jelastic.com/custom-domains' target='_blank'>documentation</a>",
-  "actions": {
-    "deployArchve": {
-      "deploy": {
-        "name": "liferay-portal-7.0-ce-ga6.zip",
-        "context": "ROOT",
-        "archive": "https://download.jelastic.com/public.php?service=files&t=5104bf6454dec4e1a516d67773271a80&download"
-      }
-    },
-    "getProxyUserPass": [
-      {
-        "cmd": [
-          "export proxy_dbuser=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e \"use main;select username from mysql_users;\" 2>/dev/null | awk -F\\  '{print $1}');",
-          "export proxy_dbpass=$(mysql -uadmin -padmin -h 127.0.0.1 -P6032 -N -e \"use main;select password from mysql_users;\" 2>/dev/null | awk -F\\  '{print $1}');"
-               ],
-         "nodeGroup": "proxy"
-       }
-       ],
-    "deployHomeDir": [
-      {
-        "cmd": [
-          "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download\" -o /opt/tomcat/temp/portal-ext.properties",
-          "sed -i \"s|jdbc.default.url\\s*=\\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.proxy.master.id}-${env.domain}/lportal|g\" /opt/tomcat/temp/portal-ext.properties",
-          "sed -i \"s|jdbc.default.username\\s*=\\s*.*|jdbc.default.username=$proxy_dbuser|g\" /opt/tomcat/temp/portal-ext.properties",
-          "mkdir -p /opt/tomcat/temp/liferay/osgi/",
-          "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=8c0313f24cfd08609e19764e13ee0bfb&download\" -o /opt/tomcat/temp/liferay/osgi/osgi.zip",
-          "unzip -q /opt/tomcat/temp/liferay/osgi/osgi.zip -d /opt/tomcat/temp/liferay/osgi",
-          "mv /opt/tomcat/temp/liferay/osgi/liferay-ce-portal-osgi-7.0-ga6/* /opt/tomcat/temp/liferay/osgi/",
-          "mkdir /opt/tomcat/lib/ext/",
-          "curl -fsSL \"https://download.jelastic.com/public.php?service=files&t=7a246c68d69745fbfecb145e14cbd8c7&download\" -o /opt/tomcat/lib/ext/lib.zip",
-          "cd /opt/tomcat/lib/ext && unzip /opt/tomcat/lib/ext/lib.zip",
-          "sed -i \"s|connectionTimeout=\"20000\"|connectionTimeout=\"700000\">|g\" /opt/tomcat/conf/context.xml",
-          "sed -i \"s|redirectPort=\"443\"|redirectPort=\"443\"  URIEncoding=\"UTF-8\"|g\" /opt/tomcat/conf/context.xml"
-        ],
-        "nodeType": "tomcat"
-      },
-      {
-        "replaceInFile": [
-          {
-            "replacements": [
-              {
-                "replacement": "jdbc.default.password=$proxy_dbpass",
-                "pattern": "jdbc\\.default\\.password\\s*=\\s*.*"
-              }
-            ],
-            "path": "/opt/tomcat/temp/portal-ext.properties",
-            "nodeType": "tomcat"
-          },
-          {
-            "replacements": [
-              {
-                "replacement": "<Manager sessionCookieDomain=\"${env.domain}\" sessionCookiePath=\"/\" />\\n    <CookieProcessor className=\"org.apache.tomcat.util.http.LegacyCookieProcessor\" />\\n</Context>",
-                "pattern": "</Context>"
-              }
-            ],
-            "path": "/opt/tomcat/conf/context.xml",
-            "nodeType": "tomcat"
-          },
-          {
-            "replacements": [
-              {
-                "replacement": "<Manager sessionCookieDomain=\"${env.domain}\" sessionCookiePath=\"/\" />\\n</Context>",
-                "pattern": "</Context>"
-              }
-            ],
-            "path": "/opt/tomcat/conf/context.xml",
-            "nodeType": "tomcat"
-          },
-          {
-            "replacements": [
-              {
-                "replacement": "common.loader=\"${catalina.base}/lib\",\"${catalina.base}/lib/*.jar\",\"${catalina.home}/lib\",\"${catalina.home}/lib/*.jar\",\"${catalina.home}/lib/ext/*.jar\",\"${catalina.home}/lib/ext\",\"${catalina.home}/lib/ext/*.jar\"",
-                "pattern": "common.loader=.*"
-              }
-            ],
-            "path": "/opt/tomcat/conf/catalina.properties",
-            "nodeType": "tomcat"
-          }
-        ]
-      }
-    ],
-    "createDb": [
-     {
-        "prepareSqlDatabase": [
-          {
-            "nodeId": "${nodes.sqldb.master.id}",
-            "loginCredentials": {
-              "user": "root",
-              "password": "${nodes.mysql5.password}"
-            },
-            "newDatabaseName": "lportal",
-            "newDatabaseUser": {
-              "name": "liferay",
-              "password": "${globals.DB_PASSWORD}"
-            }
-          }
-        ]
-      },
-      {
-        "restartNodes": {
-          "nodeType": "cp"
-        }
-      }
-    ]
-  }
-}
+---
+version: '0.3'
+type: install
+name: Liferay
+logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
+homepage: http://www.liferay.com/
+categories:
+- apps/cms
+- apps/content-management
+description: "Liferay Portal is an enterprise web platform for building business
+  solutions that deliver immediate results and long-term value."
+globals:
+  DB_PASSWORD: "${fn.password}"
+skipNodeEmails: false
+
+engine: java8
+ha: 'true'
+nodes:
+- cloudlets: 24
+  count: 2
+  nodeType: tomcat
+  tag: 8.5.29-openjdk-1.8.0_161
+- cloudlets: 8
+  count: 2
+  nodeType: mysql5
+- nodeType: nginx
+  count: 1
+  cloudlets: 8
+  nodeGroup: bl
+  displayName: Load balancer
+onInstall:
+- deployArchve
+- deployHomeDir
+- createDb
+- createProxyUser
+- restartNodes:
+    - nodeGroup: cp
+success: Please enter your new admin email, name and password. To add custom domain name for your Liferay installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains).
+actions:
+  deployArchve:
+    deploy:
+      name: liferay-portal-7.0-ce-ga6.zip
+      context: ROOT
+      archive: https://download.jelastic.com/public.php?service=files&t=5104bf6454dec4e1a516d67773271a80&download
+  deployHomeDir:
+  - cmd:
+    - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download"
+      -o /opt/tomcat/temp/portal-ext.properties
+    - sed -i "s|jdbc.default.url\s*=\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.master.id}-${env.domain}/lportal|g"
+      /opt/tomcat/temp/portal-ext.properties
+    - sed -i "s|jdbc.default.username\s*=\s*.*|jdbc.default.username=liferay|g"
+      /opt/tomcat/temp/portal-ext.properties
+    - mkdir -p /opt/tomcat/temp/liferay/osgi/
+    - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=8c0313f24cfd08609e19764e13ee0bfb&download"
+      -o /opt/tomcat/temp/liferay/osgi/osgi.zip
+    - unzip -q /opt/tomcat/temp/liferay/osgi/osgi.zip -d /opt/tomcat/temp/liferay/osgi
+    - mv /opt/tomcat/temp/liferay/osgi/liferay-ce-portal-osgi-7.0-ga6/* /opt/tomcat/temp/liferay/osgi/
+    - mkdir /opt/tomcat/lib/ext/
+    - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=7a246c68d69745fbfecb145e14cbd8c7&download"
+      -o /opt/tomcat/lib/ext/lib.zip
+    - cd /opt/tomcat/lib/ext && unzip /opt/tomcat/lib/ext/lib.zip
+    - sed -i "s|connectionTimeout="20000"|connectionTimeout="700000">|g" /opt/tomcat/conf/context.xml
+    - sed -i "s|redirectPort="443"|redirectPort="443"  URIEncoding="UTF-8"|g" /opt/tomcat/conf/context.xml
+    nodeType: tomcat
+  - replaceInFile:
+    - replacements:
+      - replacement: jdbc.default.password=${globals.DB_PASSWORD}
+        pattern: jdbc\.default\.password\s*=\s*.*
+      path: "/opt/tomcat/temp/portal-ext.properties"
+      nodeType: tomcat
+    - replacements:
+      - replacement: <Manager sessionCookieDomain="${env.domain}" sessionCookiePath="/"
+          />\n    <CookieProcessor className="org.apache.tomcat.util.http.LegacyCookieProcessor"
+          />\n</Context>
+        pattern: "</Context>"
+      path: "/opt/tomcat/conf/context.xml"
+      nodeType: tomcat
+    - replacements:
+      - replacement: <Manager sessionCookieDomain="${env.domain}" sessionCookiePath="/"
+          />\n</Context>
+        pattern: "</Context>"
+      path: "/opt/tomcat/conf/context.xml"
+      nodeType: tomcat
+    - replacements:
+      - replacement: common.loader="${catalina.base}/lib","${catalina.base}/lib/*.jar","${catalina.home}/lib","${catalina.home}/lib/*.jar","${catalina.home}/lib/ext/*.jar","${catalina.home}/lib/ext","${catalina.home}/lib/ext/*.jar"
+        pattern: common.loader=.*
+      path: "/opt/tomcat/conf/catalina.properties"
+      nodeType: tomcat
+  createDb:
+       cmd[sqldb]:
+         mysql -uroot -p${nodes.mysql5.password} -e "create database lportal;CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON *.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
+  createProxyUser:
+       cmd[proxy]:
+         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "INSERT INTO mysql_users (username, password, active, default_hostgroup, max_connections) VALUES ('liferay','$globals.DB_PASSWORD}', 1, 10, 1000);LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL USERS TO DISK;"
