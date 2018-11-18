@@ -7,8 +7,8 @@ homepage: http://www.liferay.com/
 categories:
 - apps/cms
 - apps/content-management
-description: "Liferay Portal is an enterprise web platform for building business
-  solutions that deliver immediate results and long-term value."
+description: "Auto-scalable and highly-available Liferay Portal cluster is an enterprise web platform for building business
+  solutions that deliver immediate results and long-term value. Out-of-box auto-scaling, even load and traffic distribution, master-slave data replication on certified Jelastic dockerized stack templates."
 globals:
   DB_PASSWORD: "${fn.password}"
 skipNodeEmails: false
