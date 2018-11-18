@@ -32,6 +32,7 @@ onInstall:
 - deployArchve
 - deployHomeDir
 - createDb
+- createDbUser
 - createProxyUser
 - restartNodes:
     - nodeGroup: cp
@@ -87,8 +88,11 @@ actions:
       path: "/opt/tomcat/conf/catalina.properties"
       nodeType: tomcat
   createDb:
+       cmd[${nodes.sqldb.master.id}]:
+         mysql -uroot -p${nodes.mysql5.password} -e "create database lportal;"
+  createDbUser:
        cmd[sqldb]:
-         mysql -uroot -p${nodes.mysql5.password} -e "create database lportal;CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON *.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
+         mysql -uroot -p${nodes.mysql5.password} -e "CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON *.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
   createProxyUser:
        cmd[proxy]:
          mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "INSERT INTO mysql_users (username, password, active, default_hostgroup, max_connections) VALUES ('liferay','$globals.DB_PASSWORD}', 1, 10, 1000);LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL USERS TO DISK;"
