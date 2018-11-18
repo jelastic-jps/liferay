@@ -1,7 +1,7 @@
 ---
 version: '0.3'
 type: install
-name: Liferay
+name: Liferay Cluster
 logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
 homepage: http://www.liferay.com/
 categories:
