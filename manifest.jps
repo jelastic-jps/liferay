@@ -19,7 +19,7 @@ nodes:
 - cloudlets: 24
   count: 2
   nodeType: tomcat
-  tag: 8.5.29-openjdk-1.8.0_161
+  tag: 9.0.12-openjdk-11.0.1
 - cloudlets: 8
   count: 2
   nodeType: mysql5
