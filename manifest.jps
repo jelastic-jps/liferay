@@ -36,7 +36,7 @@ onInstall:
 - createProxyUser
 - restartNodes:
     - nodeGroup: cp
-success: If required, change the **Administration User** details. Then click on **Finish Configuration**. To add a custom domain name for your Liferay installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains).
+success: If required, change the **Administration User** details. Then click on **Finish Configuration**. To add a custom domain name for your Liferay installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains). The initial setup takes time, please be patient.
 actions:
   deployArchve:
     deploy:
