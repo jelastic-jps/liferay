@@ -48,7 +48,7 @@ actions:
   - cmd:
     - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download"
       -o /opt/tomcat/temp/portal-ext.properties
-    - sed -i "s|jdbc.default.url\s*=\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.master.id}.${env.domain}/lportal|g"
+    - sed -i "s|jdbc.default.url\s*=\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.master.id}-${env.domain}/lportal|g"
       /opt/tomcat/temp/portal-ext.properties
     - sed -i "s|jdbc.default.username\s*=\s*.*|jdbc.default.username=root|g"
       /opt/tomcat/temp/portal-ext.properties
