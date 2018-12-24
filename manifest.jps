@@ -87,7 +87,7 @@ actions:
          mysql -uroot -p${nodes.mysql.password} -e "create database lportal;"
   createDbUser:
        cmd[sqldb]:
-         mysql -uroot -p${nodes.mysql.password} -e "CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON *.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
+         mysql -uroot -p${nodes.mysql.password} -e "CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON lportal.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
   createProxyUser:
        cmd[proxy]: |-
          mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "INSERT INTO mysql_users (username, password, active, default_hostgroup, max_connections) VALUES ('root','${nodes.mysql.password}', 1, 10, 1000);LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL USERS TO DISK;"
