@@ -1,42 +1,38 @@
 ---
 version: '0.3'
 type: install
-name: Liferay Cluster
+name: Liferay
 logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
 homepage: http://www.liferay.com/
 categories:
 - apps/cms
 - apps/content-management
-description: "Auto-scalable and highly-available Liferay Portal cluster is an enterprise web platform for building business
-  solutions that deliver immediate results and long-term value. Out-of-box auto-scaling, even load and traffic distribution, master-slave data replication on certified Jelastic dockerized stack templates."
+description: "Liferay Portal is an enterprise web platform for building business
+  solutions that deliver immediate results and long-term value."
 globals:
   DB_PASSWORD: "${fn.password}"
 skipNodeEmails: false
-
 engine: java8
-ha: 'true'
 nodes:
 - cloudlets: 24
-  count: 2
+  count: 1
   nodeType: tomcat
   tag: 8.5.29-openjdk-1.8.0_161
 - cloudlets: 8
   count: 2
-  nodeType: mysql5
-- nodeType: nginx
-  count: 1
-  cloudlets: 8
-  nodeGroup: bl
-  displayName: Load balancer
+  nodeType: mysql
+  tag: 5.7.22
+  cluster: true
 onInstall:
 - deployArchve
 - deployHomeDir
 - createDb
 - createDbUser
-- createProxyUser
 - restartNodes:
     - nodeGroup: cp
-success: If required, change the **Administration User** details. Then click on **Finish Configuration**. To add a custom domain name for your Liferay installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains). The initial setup takes time, please be patient.
+- createProxyUser
+
+success: Please enter valid Administrator user **Email** and change database credentials as follows *JDBC URL*=**jdbc:mysql://proxy.${env.domain}/lportal**, *User Name*=**liferay** and *Password*=**${globals.DB_PASSWORD}**. Application server restart takes time up to 5 minutes, so be patient.
 actions:
   deployArchve:
     deploy:
@@ -47,9 +43,9 @@ actions:
   - cmd:
     - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download"
       -o /opt/tomcat/temp/portal-ext.properties
-    - sed -i "s|jdbc.default.url\s*=\s*.*|jdbc.default.url=jdbc:mysql://proxy.${env.domain}/lportal|g"
+    - sed -i "s|jdbc.default.url\s*=\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.master.id}-${env.domain}/lportal|g"
       /opt/tomcat/temp/portal-ext.properties
-    - sed -i "s|jdbc.default.username\s*=\s*.*|jdbc.default.username=liferay|g"
+    - sed -i "s|jdbc.default.username\s*=\s*.*|jdbc.default.username=root|g"
       /opt/tomcat/temp/portal-ext.properties
     - mkdir -p /opt/tomcat/temp/liferay/osgi/
     - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=8c0313f24cfd08609e19764e13ee0bfb&download"
@@ -65,7 +61,7 @@ actions:
     nodeType: tomcat
   - replaceInFile:
     - replacements:
-      - replacement: jdbc.default.password=${globals.DB_PASSWORD}
+      - replacement: jdbc.default.password=${nodes.mysql.password}
         pattern: jdbc\.default\.password\s*=\s*.*
       path: "/opt/tomcat/temp/portal-ext.properties"
       nodeType: tomcat
@@ -89,10 +85,13 @@ actions:
       nodeType: tomcat
   createDb:
        cmd[${nodes.sqldb.master.id}]:
-         mysql -uroot -p${nodes.mysql5.password} -e "create database lportal;"
+         mysql -uroot -p${nodes.mysql.password} -e "create database lportal;"
   createDbUser:
        cmd[sqldb]:
-         mysql -uroot -p${nodes.mysql5.password} -e "CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON *.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
+         mysql -uroot -p${nodes.mysql.password} -e "CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON *.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
   createProxyUser:
-       cmd[proxy]:
+       cmd[proxy]: |-
+         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "INSERT INTO mysql_users (username, password, active, default_hostgroup, max_connections) VALUES ('root','${nodes.mysql.password}', 1, 10, 1000);LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL USERS TO DISK;"
          mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "INSERT INTO mysql_users (username, password, active, default_hostgroup, max_connections) VALUES ('liferay','${globals.DB_PASSWORD}', 1, 10, 1000);LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL USERS TO DISK;"
+         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "UPDATE global_variables SET variable_value='5.7.22' WHERE variable_name='mysql-server_version';"
+         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "LOAD MYSQL VARIABLES TO RUNTIME; SAVE MYSQL VARIABLES TO DISK;"
