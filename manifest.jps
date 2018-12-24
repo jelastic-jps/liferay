@@ -12,6 +12,7 @@ globals:
   DB_PASSWORD: "${fn.password}"
 skipNodeEmails: false
 engine: java8
+ha: 'true'
 nodes:
 - cloudlets: 24
   count: 2
