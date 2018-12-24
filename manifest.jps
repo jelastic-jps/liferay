@@ -14,9 +14,14 @@ skipNodeEmails: false
 engine: java8
 nodes:
 - cloudlets: 24
-  count: 1
+  count: 2
   nodeType: tomcat
   tag: 8.5.29-openjdk-1.8.0_161
+- nodeType: nginx
+  count: '1'
+  cloudlets: '8'
+  nodeGroup: bl
+  displayName: Load balancer
 - cloudlets: 8
   count: 2
   nodeType: mysql
