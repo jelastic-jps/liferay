@@ -1,101 +1,79 @@
 ---
 version: '0.3'
 type: install
-name: Liferay Portal
+name: Liferay
 logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
 homepage: http://www.liferay.com/
+success: Please enter valid Administrator user **Email** and change database credentials as follows *JDBC URL*=**jdbc:mysql://sqldb.${env.domain}/lportal**, *User Name*=**liferay** and *Password*=**${globals.DB_PASS}**, then restart application servers. Application server restart takes time up to 5 minutes, so be patient. Use password **test** for the first login to Liferay admin panel.
 categories:
 - apps/cms
 - apps/content-management
-description: "Liferay Portal is an enterprise web platform for building business solutions that deliver immediate results and long-term value. Out-of-box autoscaling, even load and traffic distribution, master-slave data replication on certified Jelastic dockerized stack templates."
+description: "Liferay Portal is an enterprise web platform for building business
+  solutions that deliver immediate results and long-term value."
 globals:
-  DB_PASSWORD: "${fn.password}"
+  DB_USER: "liferay"
+  DB_PASS: "mypass"
 skipNodeEmails: false
-engine: java8
 nodes:
-- cloudlets: 24
+- cloudlets: 26
   count: 2
   nodeType: tomcat
-  tag: 8.5.29-openjdk-1.8.0_161
-- nodeType: nginx
-  count: '1'
-  cloudlets: '8'
-  nodeGroup: bl
-  displayName: Load balancer
+  tag: 9.0.6-openjdk-1.8.0_161
+  links: sqldb:DB
+  env:
+    JELASTIC_EXPOSE: 8080
 - cloudlets: 8
   count: 2
   nodeType: mysql
   tag: 5.7.22
-  cluster: true
+  env:
+    ON_ENV_INSTALL: ""
+- nodeType: nginx
+  count: 1
+  cloudlets: 8
+  nodeGroup: bl
+  displayName: Load balancer
+ha: true
 onInstall:
-- deployArchve
-- deployHomeDir
+- installJps:
+    jps: https://raw.githubusercontent.com/vlobzakov/liferay-cluster/master/libs/sudopriviges.jps
+- installJps:
+    jps: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master/scripts/ms-mm-configuration.jps
+    settings:
+      path: "https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master"
+      db_user: "${globals.DB_USER}"
+      db_pass: "${globals.DB_PASS}"
+      scheme: "master"
+    nodeGroup: sqldb
+- deployArchive
 - createDb
-- createDbUser
 - restartNodes:
     - nodeGroup: cp
-- createProxyUser
-
-success: Please enter valid Administrator user **Email** and change database credentials as follows *JDBC URL*=**jdbc:mysql://proxy.${env.domain}/lportal**, *User Name*=**liferay** and *Password*=**${globals.DB_PASSWORD}**. Application server restart takes time up to 5 minutes, so be patient.
 actions:
-  deployArchve:
-    deploy:
-      name: liferay-portal-7.0-ce-ga6.zip
-      context: ROOT
-      archive: https://download.jelastic.com/public.php?service=files&t=5104bf6454dec4e1a516d67773271a80&download
-  deployHomeDir:
-  - cmd:
-    - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=c86b14ce3f71b6d93ae4b062569af22e&download"
-      -o /opt/tomcat/temp/portal-ext.properties
-    - sed -i "s|jdbc.default.url\s*=\s*.*|jdbc.default.url=jdbc:mysql://node${nodes.sqldb.master.id}-${env.domain}/lportal|g"
-      /opt/tomcat/temp/portal-ext.properties
-    - sed -i "s|jdbc.default.username\s*=\s*.*|jdbc.default.username=root|g"
-      /opt/tomcat/temp/portal-ext.properties
-    - mkdir -p /opt/tomcat/temp/liferay/osgi/
-    - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=8c0313f24cfd08609e19764e13ee0bfb&download"
-      -o /opt/tomcat/temp/liferay/osgi/osgi.zip
-    - unzip -q /opt/tomcat/temp/liferay/osgi/osgi.zip -d /opt/tomcat/temp/liferay/osgi
-    - mv /opt/tomcat/temp/liferay/osgi/liferay-ce-portal-osgi-7.0-ga6/* /opt/tomcat/temp/liferay/osgi/
-    - mkdir /opt/tomcat/lib/ext/
-    - curl -fsSL "https://download.jelastic.com/public.php?service=files&t=7a246c68d69745fbfecb145e14cbd8c7&download"
-      -o /opt/tomcat/lib/ext/lib.zip
-    - cd /opt/tomcat/lib/ext && unzip /opt/tomcat/lib/ext/lib.zip
-    - sed -i "s|connectionTimeout="20000"|connectionTimeout="700000">|g" /opt/tomcat/conf/context.xml
-    - sed -i "s|redirectPort="443"|redirectPort="443"  URIEncoding="UTF-8"|g" /opt/tomcat/conf/context.xml
-    nodeType: tomcat
-  - replaceInFile:
-    - replacements:
-      - replacement: jdbc.default.password=${nodes.mysql.password}
-        pattern: jdbc\.default\.password\s*=\s*.*
-      path: "/opt/tomcat/temp/portal-ext.properties"
-      nodeType: tomcat
-    - replacements:
-      - replacement: <Manager sessionCookieDomain="${env.domain}" sessionCookiePath="/"
-          />\n    <CookieProcessor className="org.apache.tomcat.util.http.LegacyCookieProcessor"
-          />\n</Context>
-        pattern: "</Context>"
-      path: "/opt/tomcat/conf/context.xml"
-      nodeType: tomcat
-    - replacements:
-      - replacement: <Manager sessionCookieDomain="${env.domain}" sessionCookiePath="/"
-          />\n</Context>
-        pattern: "</Context>"
-      path: "/opt/tomcat/conf/context.xml"
-      nodeType: tomcat
-    - replacements:
-      - replacement: common.loader="${catalina.base}/lib","${catalina.base}/lib/*.jar","${catalina.home}/lib","${catalina.home}/lib/*.jar","${catalina.home}/lib/ext/*.jar","${catalina.home}/lib/ext","${catalina.home}/lib/ext/*.jar"
-        pattern: common.loader=.*
-      path: "/opt/tomcat/conf/catalina.properties"
-      nodeType: tomcat
+  deployArchive:
+    cmd [cp]: |-
+      sudo chmod 777 /opt
+      cd /opt
+      wget https://sourceforge.net/projects/lportal/files/Liferay%20Portal/7.1.0%20GA1/liferay-ce-portal-tomcat-7.1.0-ga1-20180703012531655.zip/download -O liferay.zip
+      unzip liferay.zip
+      mv liferay-ce-portal-7.1.0-ga1/ liferay
+      cp -R /opt/liferay/data /opt
+      cp -R /opt/liferay/license /opt
+      cp -R /opt/liferay/osgi /opt
+      cp -R /opt/liferay/tools /opt
+      cp -R /opt/liferay/work /opt
+      cp -R /opt/liferay/.liferay-home /opt
+      rm -fR /opt/tomcat/webapps/ROOT/*
+      cp -R /opt/liferay/tomcat-9.0.6/* /opt/tomcat/
+      cat << EOF > /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties
+      jdbc.default.driverClassName=com.mysql.jdbc.Driver
+      jdbc.default.url=jdbc:mysql://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
+      jdbc.default.username=${globals.DB_USER}
+      jdbc.default.password=${globals.DB_PASS}
+      schema.run.enabled=true
+      schema.run.minimal=true
+      EOF
+      cp /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties /opt
   createDb:
        cmd[${nodes.sqldb.master.id}]:
-         mysql -uroot -p${nodes.mysql.password} -e "create database lportal;"
-  createDbUser:
-       cmd[sqldb]:
-         mysql -uroot -p${nodes.mysql.password} -e "CREATE USER 'liferay'@'%' IDENTIFIED BY '${globals.DB_PASSWORD}';GRANT ALL ON lportal.* TO 'liferay'@'%';FLUSH PRIVILEGES;"
-  createProxyUser:
-       cmd[proxy]: |-
-         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "INSERT INTO mysql_users (username, password, active, default_hostgroup, max_connections) VALUES ('root','${nodes.mysql.password}', 1, 10, 1000);LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL USERS TO DISK;"
-         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "INSERT INTO mysql_users (username, password, active, default_hostgroup, max_connections) VALUES ('liferay','${globals.DB_PASSWORD}', 1, 10, 1000);LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL USERS TO DISK;"
-         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "UPDATE global_variables SET variable_value='5.7.22' WHERE variable_name='mysql-server_version';"
-         mysql -uadmin -padmin -h 127.0.0.1 -P6032 -e "LOAD MYSQL VARIABLES TO RUNTIME; SAVE MYSQL VARIABLES TO DISK;"
+          mysql -u${globals.DB_USER} -p${globals.DB_PASS} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
