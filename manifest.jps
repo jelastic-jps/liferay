@@ -49,6 +49,7 @@ onInstall:
 - createDb
 - restartNodes:
     - nodeGroup: cp
+- redir
 actions:
   deployArchive:
     cmd [cp]: |-
@@ -77,3 +78,8 @@ actions:
   createDb:
        cmd[${nodes.sqldb.master.id}]:
           mysql -u${globals.DB_USER} -p${globals.DB_PASS} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
+  redir:
+       cmd[cp]: |-
+          iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8080
+          service iptables save
+       user: root
