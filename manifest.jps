@@ -20,8 +20,6 @@ nodes:
   nodeType: tomcat
   tag: 9.0.6-openjdk-1.8.0_161
   links: sqldb:DB
-  env:
-    JELASTIC_EXPOSE: 8080
 - cloudlets: 8
   count: 2
   nodeType: mysql
@@ -65,7 +63,8 @@ actions:
       cp -R /opt/liferay/work /opt
       cp -R /opt/liferay/.liferay-home /opt
       rm -fR /opt/tomcat/webapps/ROOT/*
-      cp -R /opt/liferay/tomcat-9.0.6/* /opt/tomcat/
+      cp -nR /opt/liferay/tomcat-9.0.6/* /opt/tomcat/
+      cp /opt/liferay/tomcat-9.0.6/conf/catalina.properties /opt/tomcat/conf
       cat << EOF > /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties
       jdbc.default.driverClassName=com.mysql.jdbc.Driver
       jdbc.default.url=jdbc:mysql://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
@@ -78,8 +77,3 @@ actions:
   createDb:
        cmd[${nodes.sqldb.master.id}]:
           mysql -u${globals.DB_USER} -p${globals.DB_PASS} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
-  redir:
-       cmd[cp]: |-
-          iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8080
-          service iptables save
-       user: root
