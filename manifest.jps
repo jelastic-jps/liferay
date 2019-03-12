@@ -47,7 +47,7 @@ onInstall:
 - createDb
 - restartNodes:
     - nodeGroup: cp
-- redir
+
 actions:
   deployArchive:
     cmd [cp]: |-
