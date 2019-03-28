@@ -7,7 +7,6 @@ application:
   targetNodes:
     nodeGroup:
     - cp
-    - nosqldb
     - sqldb
     - bl
   name: Root Access
@@ -28,9 +27,6 @@ application:
       - procedure: InstallRootSQLdb
         params:
           nodeGroup: sqldb
-      - procedure: InstallRootNoSQLdb
-        params:
-          nodeGroup: nosqldb
       - procedure: InstallRootBL
         params:
           nodeGroup: bl
@@ -53,14 +49,6 @@ application:
         commands:
         - sed -i "\$amysql\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
         - sed -i "\$apostgres\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
-        - sed -i "\$ajelastic\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
-  - id: InstallRootNoSQLdb
-    onCall:
-    - executeShellCommands:
-      - nodeGroup: nosqldb
-        user: root
-        commands:
-        - sed -i "\$amongod\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
         - sed -i "\$ajelastic\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
   - id: InstallRootBL
     onCall:
