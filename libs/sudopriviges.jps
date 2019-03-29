@@ -8,7 +8,6 @@ application:
     nodeGroup:
     - cp
     - sqldb
-    - lb
   name: Root Access
   logo: http://blog.jelastic.com/wp-content/uploads/2015/11/cs-scheme1.png
   version: '1.0'
@@ -27,9 +26,6 @@ application:
       - procedure: InstallRootSQLdb
         params:
           nodeGroup: sqldb
-      - procedure: InstallRootBL
-        params:
-          nodeGroup: lb
   procedures:
   - id: InstallRoot
     onCall:
@@ -49,14 +45,6 @@ application:
         commands:
         - sed -i "\$amysql\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
         - sed -i "\$apostgres\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
-        - sed -i "\$ajelastic\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
-  - id: InstallRootBL
-    onCall:
-    - executeShellCommands:
-      - nodeGroup: lb
-        user: root
-        commands:
-        - sed -i "\$anginx\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
         - sed -i "\$ajelastic\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
   success:
     text: To get root access please connect to container via SSH and execute command
