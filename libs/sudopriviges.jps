@@ -8,7 +8,7 @@ application:
     nodeGroup:
     - cp
     - sqldb
-    - bl
+    - lb
   name: Root Access
   logo: http://blog.jelastic.com/wp-content/uploads/2015/11/cs-scheme1.png
   version: '1.0'
@@ -29,7 +29,7 @@ application:
           nodeGroup: sqldb
       - procedure: InstallRootBL
         params:
-          nodeGroup: bl
+          nodeGroup: lb
   procedures:
   - id: InstallRoot
     onCall:
@@ -53,7 +53,7 @@ application:
   - id: InstallRootBL
     onCall:
     - executeShellCommands:
-      - nodeGroup: bl
+      - nodeGroup: lb
         user: root
         commands:
         - sed -i "\$anginx\ ALL=NOPASSWD\:\ ALL" /etc/sudoers
