@@ -1,5 +1,5 @@
 ---
-version: '0.3'
+version: '1.5'
 type: install
 name: Liferay
 logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
@@ -10,13 +10,9 @@ categories:
 - apps/content-management
 description: "Liferay Portal is an enterprise web platform for building business
   solutions that deliver immediate results and long-term value."
-globals:
-  DB_USER: "liferay"
-  DB_PASS: "mypass"
-skipNodeEmails: false
+
 nodes:
-- cloudlets: 26
-  count: 2
+- cloudlets: 18
   nodeType: tomcat
   tag: 9.0.6-openjdk-1.8.0_161
   links: sqldb:DB
@@ -26,12 +22,7 @@ nodes:
   tag: 5.7.22
   env:
     ON_ENV_INSTALL: ""
-- nodeType: nginx
-  count: 1
-  cloudlets: 8
-  nodeGroup: bl
-  displayName: Load balancer
-ha: true
+
 onInstall:
 - installJps:
     jps: https://raw.githubusercontent.com/vlobzakov/liferay-cluster/master/libs/sudopriviges.jps
@@ -39,8 +30,6 @@ onInstall:
     jps: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master/scripts/ms-mm-configuration.jps
     settings:
       path: "https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master"
-      db_user: "${globals.DB_USER}"
-      db_pass: "${globals.DB_PASS}"
       scheme: "master"
     nodeGroup: sqldb
 - deployArchive
@@ -68,12 +57,12 @@ actions:
       cat << EOF > /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties
       jdbc.default.driverClassName=com.mysql.jdbc.Driver
       jdbc.default.url=jdbc:mysql://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
-      jdbc.default.username=${globals.DB_USER}
-      jdbc.default.password=${globals.DB_PASS}
+      jdbc.default.username=root
+      jdbc.default.password=${nodes.mysql.password}
       schema.run.enabled=true
       schema.run.minimal=true
       EOF
       cp /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties /opt
   createDb:
-       cmd[${nodes.sqldb.master.id}]:
-          mysql -u${globals.DB_USER} -p${globals.DB_PASS} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
+    cmd[${nodes.sqldb.master.id}]:
+       mysql -uroot -p${nodes.mysql.password} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
