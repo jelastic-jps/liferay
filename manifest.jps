@@ -12,7 +12,7 @@ description: "Liferay Portal is an enterprise web platform for building business
   solutions that deliver immediate results and long-term value."
 globals:
   DB_USER: liferay
-  DB_PASS: ${fn.password(32)}
+  DB_PASS: ${fn.password(8)}
 nodes:
 - cloudlets: 18
   nodeType: tomcat
