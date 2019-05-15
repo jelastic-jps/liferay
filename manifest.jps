@@ -3,16 +3,18 @@ version: '1.5'
 type: install
 name: Liferay
 logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
+baseUrl: https://raw.githubusercontent.com/vlobzakov/liferay-cluster/master
 homepage: http://www.liferay.com/
-success: Please enter valid Administrator user **Email** and change database credentials to *UserName*=**liferay** and *Password*=**${globals.DB_PASS}**, then restart application servers. Application server restart takes time up to 5 minutes, so be patient. Use password **test** for the first login to Liferay admin panel.
+success: Please enter valid Administrator user **Email** and change database credentials *User Name*=**liferay** and *Password*=**${globals.DB_PASS}**, then restart application servers. Application server restart takes time up to 5 minutes, so be patient. Use password **test** for the first login to Liferay admin panel.
 categories:
 - apps/cms
 - apps/content-management
-description: "Liferay Portal is an enterprise web platform for building business
-  solutions that deliver immediate results and long-term value."
+description: "Liferay Portal is an enterprise web platform for building business solutions that deliver immediate results and long-term value."
+
 globals:
-  DB_USER: liferay
+  DB_USER: "liferay"
   DB_PASS: ${fn.password(8)}
+
 nodes:
 - cloudlets: 18
   nodeType: tomcat
@@ -27,8 +29,6 @@ nodes:
 
 onInstall:
 - installJps:
-    jps: https://raw.githubusercontent.com/vlobzakov/liferay-cluster/master/libs/sudopriviges.jps
-- installJps:
     jps: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master/scripts/ms-mm-configuration.jps
     settings:
       path: "https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master"
@@ -36,19 +36,23 @@ onInstall:
       db_pass: "${globals.DB_PASS}"
       scheme: "master"
     nodeGroup: sqldb
+- changerights
 - deployArchive
 - createDb
 - restartNodes:
     - nodeGroup: cp
 
 actions:
+  changerights: 
+    cmd[cp]: chmod 777 /opt
+    user: root
+    
   deployArchive:
     cmd [cp]: |-
-      sudo chmod 777 /opt
       cd /opt
-      wget https://sourceforge.net/projects/lportal/files/Liferay%20Portal/7.1.0%20GA1/liferay-ce-portal-tomcat-7.1.0-ga1-20180703012531655.zip/download -O liferay.zip
-      unzip liferay.zip
-      mv liferay-ce-portal-7.1.0-ga1/ liferay
+      wget https://sourceforge.net/projects/lportal/files/Liferay%20Portal/7.1.0%20GA1/liferay-ce-portal-tomcat-7.1.0-ga1-20180703012531655.zip/download -O /opt/liferay.zip
+      unzip /opt/liferay.zip -d /opt
+      mv /opt/liferay-ce-portal-7.1.0-ga1 /opt/liferay
       cp -R /opt/liferay/data /opt
       cp -R /opt/liferay/license /opt
       cp -R /opt/liferay/osgi /opt
@@ -67,6 +71,7 @@ actions:
       schema.run.minimal=true
       EOF
       cp /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties /opt
+    
   createDb:
-    cmd[${nodes.sqldb.master.id}]:
-       mysql -uroot -p${nodes.mysql.password} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
+       cmd[${nodes.sqldb.master.id}]:
+          mysql -uroot -p${nodes.mysql.password} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
