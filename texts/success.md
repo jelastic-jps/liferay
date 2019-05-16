@@ -1,3 +1,2 @@
-Multifunctional banking online system cluster with master-slave database replication and High Availability.
-  To access your system, use credentials you've registered at [Cyclos License Server](https://license.cyclos.org/app/guest/register).
-  **The first launch takes time for the required configurations to be applied. So, be patient.**
+Please enter valid Administrator user **Email** and change database credentials to *UserName*=**liferay** and *Password*=**${globals.DB_PASS}**, then restart 
+application servers and refresh the portal web page. It takes time up to 5 minutes, so be patient. Use password "**test**" for the first login to Liferay admin panel.
