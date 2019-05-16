@@ -5,11 +5,16 @@ name: Liferay
 logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
 baseUrl: https://raw.githubusercontent.com/vlobzakov/liferay-cluster/master
 homepage: http://www.liferay.com/
-success: Please enter valid Administrator user **Email** and change database credentials *User Name*=**liferay** and *Password*=**${globals.DB_PASS}**, then restart application servers. Application server restart takes time up to 5 minutes, so be patient. Use password **test** for the first login to Liferay admin panel.
+
+description:
+  text: /texts/description.md
+  short: Leading Open Source web-based platforms to build portals
+
+success:
+  text: /texts/success.md 
+
 categories:
 - apps/cms
-- apps/content-management
-description: "Liferay Portal is an enterprise web platform for building business solutions that deliver immediate results and long-term value."
 
 globals:
   DB_USER: "liferay"

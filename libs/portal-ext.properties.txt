@@ -1,5 +1,0 @@
-resource.repositories.root=${user.home}/liferay
-jdbc.default.driverClassName=com.mysql.jdbc.Driver
-jdbc.default.url=
-jdbc.default.username=
-jdbc.default.password=
