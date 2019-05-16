@@ -1,11 +1,11 @@
 [![Liferay](images/Liferay-Logo.png)](../../../liferay)
 
-## Liferay Cluster
+## Liferay Portal
 
 The JPS package deploys [Liferay](http://www.liferay.com/) that initially contains 1 application server and database cluster. 
 
 ### Highlights
-This package is designed to deploy Liferay environment is an enterprise web platform for building business solutions that deliver immediate results and long-term value.
+It is designed to deploy Liferay environment as an enterprise web platform for building business solutions that deliver immediate results and long-term value.
 Liferay has built its business becoming the best partner for providing enterprise-quality support, updates and management tools to companies running Liferay in production.
 To store data it has MySQL database cluster with Master-Master replicatioon topology. Such replication topology provides additional benefits, such as quick response to the requests and High Availability capabilities with DNS round-robin load-balancing. 
 
