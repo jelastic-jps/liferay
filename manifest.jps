@@ -20,6 +20,8 @@ globals:
   DB_USER: "liferay"
   DB_PASS: ${fn.password(8)}
 
+skipNodeEmails: true
+
 nodes:
 - cloudlets: 18
   nodeType: tomcat
@@ -70,8 +72,8 @@ actions:
       cat << EOF > /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties
       jdbc.default.driverClassName=com.mysql.jdbc.Driver
       jdbc.default.url=jdbc:mysql://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
-      jdbc.default.username=root
-      jdbc.default.password=${nodes.mysql.password}
+      jdbc.default.username=${globals.DB_USER}
+      jdbc.default.password=${globals.DB_PASS}
       schema.run.enabled=true
       schema.run.minimal=true
       EOF
@@ -79,4 +81,4 @@ actions:
     
   createDb:
        cmd[${nodes.sqldb.master.id}]:
-          mysql -uroot -p${nodes.mysql.password} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
+          mysql -u${globals.DB_USER} -p${globals.DB_PASS} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
