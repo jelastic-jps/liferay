@@ -2,16 +2,16 @@
 version: '1.5'
 type: install
 name: Liferay
-logo: https://raw.githubusercontent.com/jelastic-jps/liferay/master/images/liferay.png
-baseUrl: https://raw.githubusercontent.com/vlobzakov/liferay-cluster/master
+baseUrl: https://raw.githubusercontent.com/jelastic-jps
+logo: liferay/master/images/liferay.png
 homepage: http://www.liferay.com/
 
 description:
-  text: /texts/description.md
+  text: liferay/master/texts/description.md
   short: Leading Open Source web-based platforms to build portals
 
 success:
-  text: /texts/success.md 
+  text: liferay/master/texts/success.md 
 
 categories:
 - apps/cms
@@ -24,8 +24,8 @@ skipNodeEmails: true
 
 nodes:
 - cloudlets: 18
-  nodeType: tomcat
-  tag: 9.0.6-openjdk-1.8.0_161
+  nodeType: tomcat9
+  engine: java8
   links: sqldb:DB
 - cloudlets: 8
   count: 2
@@ -36,9 +36,9 @@ nodes:
 
 onInstall:
 - installJps:
-    jps: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master/scripts/ms-mm-configuration.jps
+    jps: ${baseUrl}/mysql-cluster/master/scripts/ms-mm-configuration.jps
     settings:
-      path: "https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master"
+      path: "${baseUrl}/mysql-cluster/master"
       db_user: "${globals.DB_USER}"
       db_pass: "${globals.DB_PASS}"
       scheme: "master"
