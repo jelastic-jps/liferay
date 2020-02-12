@@ -2,7 +2,7 @@
 version: '1.5'
 type: install
 name: Liferay
-baseUrl: https://raw.githubusercontent.com/jelastic-jps
+baseUrl: https://raw.githubusercontent.com/jelastic-jps/
 logo: liferay/master/images/liferay.png
 homepage: http://www.liferay.com/
 
@@ -10,8 +10,7 @@ description:
   text: liferay/master/texts/description.md
   short: Leading Open Source web-based platforms to build portals
 
-success:
-  text: liferay/master/texts/success.md 
+success: liferay/master/texts/success.md 
 
 categories:
 - apps/cms
