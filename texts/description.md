@@ -1,0 +1,1 @@
+Liferay Portal is an open source enterprise portal developed on Java, that is designed for centralized access to several different corporate applications in one place.
