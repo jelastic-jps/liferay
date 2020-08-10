@@ -1,6 +1,7 @@
 ---
 version: '1.5'
 type: install
+id: liferay
 name: Liferay
 baseUrl: https://raw.githubusercontent.com/jelastic-jps/
 logo: liferay/master/images/liferay.png
