@@ -1,4 +1,3 @@
----
 version: '1.5'
 type: install
 id: liferay
@@ -25,7 +24,7 @@ skipNodeEmails: true
 nodes:
 - cloudlets: 18
   nodeType: tomcat9
-  engine: java8
+  engine: openjdk8
   links: sqldb:DB
 - cloudlets: 8
   count: 2
