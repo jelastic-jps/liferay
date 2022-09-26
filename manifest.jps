@@ -22,31 +22,28 @@ globals:
 skipNodeEmails: true
 
 nodes:
-- cloudlets: 18
+- cloudlets: 32
   nodeType: tomcat9
-  engine: openjdk8
+  engine: openjdk11
   links: sqldb:DB
 - cloudlets: 8
   count: 2
-  nodeType: mysql
-  tag: 5.7.22
-  env:
-    ON_ENV_INSTALL: ""
+  nodeType: mysql8
 
 onInstall:
-- installJps:
-    jps: ${baseUrl}mysql-cluster/master/scripts/ms-mm-configuration.jps
-    settings:
-      path: "${baseUrl}mysql-cluster/master"
-      db_user: "${globals.DB_USER}"
-      db_pass: "${globals.DB_PASS}"
-      scheme: "master"
-    nodeGroup: sqldb
-- changerights
-- deployArchive
-- createDb
-- restartNodes:
-    - nodeGroup: cp
+  - installJps:
+      jps: ${baseUrl}mysql-cluster/master/scripts/ms-mm-configuration.jps
+      settings:
+        path: "${baseUrl}mysql-cluster/master"
+        db_user: "${globals.DB_USER}"
+        db_pass: "${globals.DB_PASS}"
+        scheme: "master"
+      nodeGroup: sqldb
+  - changerights
+  - deployArchive
+  - createDb
+  - restartNodes:
+      - nodeGroup: cp
 
 actions:
   changerights: 
@@ -54,29 +51,30 @@ actions:
     user: root
     
   deployArchive:
-    cmd [cp]: |-
-      cd /opt
-      wget --no-check-certificate "https://download.jelastic.com/public.php?service=files&t=cee82137f53af3216f8d1775a30fbb79&download" -O /opt/liferay.zip
-      unzip /opt/liferay.zip -d /opt
-      mv /opt/liferay-ce-portal-7.1.0-ga1 /opt/liferay
-      cp -R /opt/liferay/data /opt
-      cp -R /opt/liferay/license /opt
-      cp -R /opt/liferay/osgi /opt
-      cp -R /opt/liferay/tools /opt
-      cp -R /opt/liferay/work /opt
-      cp -R /opt/liferay/.liferay-home /opt
-      rm -fR /opt/tomcat/webapps/ROOT/*
-      cp -nR /opt/liferay/tomcat-9.0.6/* /opt/tomcat/
-      cp /opt/liferay/tomcat-9.0.6/conf/catalina.properties /opt/tomcat/conf
-      cat << EOF > /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties
-      jdbc.default.driverClassName=com.mysql.jdbc.Driver
-      jdbc.default.url=jdbc:mysql://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
-      jdbc.default.username=${globals.DB_USER}
-      jdbc.default.password=${globals.DB_PASS}
-      schema.run.enabled=true
-      schema.run.minimal=true
-      EOF
-      cp /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties /opt
+    - cmd [cp]: yum -y install p7zip
+      user: root
+    - cmd [cp]: |-
+        cd /opt
+        wget --no-check-certificate "https://download.jelastic.com/public.php?service=files&t=e93cd3ca3b6b5b7b8756a2c6100034cf&download" -O /opt/liferay.7z
+        7za x liferay.7z -y > /dev/null
+        mv /opt/liferay-ce-portal-7.4.3.39-ga39 /opt/liferay
+        cp -R /opt/liferay/data /opt
+        cp -R /opt/liferay/license /opt
+        cp -R /opt/liferay/osgi /opt
+        cp -R /opt/liferay/tools /opt
+        cp -R /opt/liferay/.liferay-home /opt
+        rm -fR /opt/tomcat/webapps/ROOT/*
+        cp -nR /opt/liferay/tomcat-9.0.56/* /opt/tomcat/
+        cp /opt/liferay/tomcat-9.0.56/conf/catalina.properties /opt/tomcat/conf
+        cat << EOF > /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties
+        jdbc.default.driverClassName=com.mysql.jdbc.Driver
+        jdbc.default.url=jdbc:mysql://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
+        jdbc.default.username=${globals.DB_USER}
+        jdbc.default.password=${globals.DB_PASS}
+        schema.run.enabled=true
+        schema.run.minimal=true
+        EOF
+        cp /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties /opt
     
   createDb:
        cmd[${nodes.sqldb.master.id}]:
