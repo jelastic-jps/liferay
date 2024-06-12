@@ -17,7 +17,7 @@ categories:
 
 globals:
   DB_USER: "liferay"
-  DB_PASS: ${fn.password(8)}
+  DB_PASS: ${fn.password(10)}
 
 skipNodeEmails: true
 
@@ -28,20 +28,22 @@ nodes:
   links: sqldb:DB
 - cloudlets: 8
   count: 2
-  nodeType: mysql8
+  nodeType: mariadb106
+  cluster:
+    scheme: master
+    db_user: ${globals.DB_USER}
+    db_pass: ${globals.DB_PASS}
+    is_proxysql: false
+  env:
+    SCHEME: master
+    DB_USER: ${globals.DB_USER}
+    DB_PASS: ${globals.DB_PASS}
+    IS_PROXYSQL: false
 
 onInstall:
-  - installJps:
-      jps: ${baseUrl}mysql-cluster/master/scripts/ms-mm-configuration.jps
-      settings:
-        path: "${baseUrl}mysql-cluster/master"
-        db_user: "${globals.DB_USER}"
-        db_pass: "${globals.DB_PASS}"
-        scheme: "master"
-      nodeGroup: sqldb
   - changerights
-  - deployArchive
   - createDb
+  - deployArchive
   - restartNodes:
       - nodeGroup: cp
 
@@ -51,31 +53,34 @@ actions:
     user: root
     
   deployArchive:
-    - cmd [cp]: yum -y install p7zip
+    - cmd [cp]:  |-
+        yum -y install p7zip
+        jem service stop
       user: root
     - cmd [cp]: |-
         cd /opt
-        wget --no-check-certificate "https://download.jelastic.com/public.php?service=files&t=e93cd3ca3b6b5b7b8756a2c6100034cf&download" -O /opt/liferay.7z
+        wget --no-check-certificate "https://download.jelastic.com/public.php?service=files&t=5a90929a5199bc71ce26decc79bb0463&download" -O /opt/liferay.7z
         7za x liferay.7z -y > /dev/null
-        mv /opt/liferay-ce-portal-7.4.3.39-ga39 /opt/liferay
+        mv /opt/liferay-portal /opt/liferay
         cp -R /opt/liferay/data /opt
         cp -R /opt/liferay/license /opt
         cp -R /opt/liferay/osgi /opt
         cp -R /opt/liferay/tools /opt
         cp -R /opt/liferay/.liferay-home /opt
-        rm -fR /opt/tomcat/webapps/ROOT/*
-        cp -nR /opt/liferay/tomcat-9.0.56/* /opt/tomcat/
-        cp /opt/liferay/tomcat-9.0.56/conf/catalina.properties /opt/tomcat/conf
+        rm -fR /opt/tomcat/webapps/ROOT/* /opt/liferay.7z
+        cp -nR /opt/liferay/tomcat/* /opt/tomcat/
+        cp /opt/liferay/tomcat/conf/catalina.properties /opt/tomcat/conf
         cat << EOF > /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties
-        jdbc.default.driverClassName=com.mysql.jdbc.Driver
-        jdbc.default.url=jdbc:mysql://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
+        jdbc.default.driverClassName=org.mariadb.jdbc.Driver
+        jdbc.default.url=jdbc:mariadb://sqldb.${env.domain}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
         jdbc.default.username=${globals.DB_USER}
         jdbc.default.password=${globals.DB_PASS}
         schema.run.enabled=true
         schema.run.minimal=true
+        virtual.hosts.valid.hosts=${env.domain}
         EOF
         cp /opt/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties /opt
     
   createDb:
        cmd[${nodes.sqldb.master.id}]:
-          mysql -u${globals.DB_USER} -p${globals.DB_PASS} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
+          mariadb -u${globals.DB_USER} -p${globals.DB_PASS} -h DB -e "CREATE DATABASE IF NOT EXISTS lportal;"
